@@ -4,6 +4,10 @@ import scala.scalajs.js
 import js.Dynamic.{ global => g, literal => lit }
 import org.scalajs.jquery.JQuery
 
+object JCanvas {
+  implicit def query2canvas(query:JQuery):JCanvas = query.asInstanceOf[JCanvas]
+}
+
 class JCanvas extends JQuery {
   def addLayer(properties:js.Any):JCanvas = ???
   def addLayerToGroup(layerID:js.Any, groupName:js.Any):JCanvas = ???

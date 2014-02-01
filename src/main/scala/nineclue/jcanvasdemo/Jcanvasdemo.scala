@@ -3,6 +3,7 @@ package nineclue.jcanvasdemo
 import scala.scalajs.js
 import js.Dynamic.{ global => g, literal => lit }
 import org.scalajs.jquery.jQuery
+import JCanvas.query2canvas
 
 object Jcanvasdemo {
   def main(): Unit = {
@@ -12,6 +13,9 @@ object Jcanvasdemo {
     val canvas2 = jQuery("<canvas></canvas>").attr(lit(id="circles", width = 400, height = 400)).css("border", "1px solid gray")
     val greenCircle = lit(draggable = true, fillStyle = "green", x = 100, y = 100, radius = 50)
     jQuery("#playground").append(canvas2).find("#circles").asInstanceOf[JCanvas].drawArc(greenCircle)
+    val canvas3:JCanvas = jQuery("<canvas></canvas>")
+    jQuery("#playground").append(canvas3)
+    canvas3.attr(lit(id="texts", width = 800, height = 600)).css("border", "1px solid black").drawText(lit(fillStyle="#9cf", strokeStyle="#25a", strokeWidth=2, x=50, y=50, fontFamily="sans serif", fontSize=48, text="Click me!", align="left", respectAlign=true, layer=true, click=() => { canvas3.animateLayer(0, lit(scale = "+=0.5"), 250) }))
   }
 
 
@@ -25,9 +29,18 @@ object Jcanvasdemo {
     val height = canvas.attr("height").toInt
     def x2x = ratio2value((0, width), (-100, 100))_
     def y2y = ratio2value((0, height), (200, -10))_
-    for (x <- (-100 to 100 by 2)) {
-      canvas.drawLine(lit(strokeStyle = "green", strokeWidth = 3, x1 = x2x(x), y1 = y2y(f(x)), x2 = x2x(x+10), y2 = y2y(f(x+10))))
+    val args = collection.mutable.ArrayBuffer[(String, js.Any)](("strokeStyle", "green"), ("strokeWidth", 3))
+    for { 
+      i <- (0 to 100)
+      x = i * 2 - 100
+      cx = x2x(x)
+      y = f(x)
+      cy = y2y(y)
+    } {
+      // println(i, x, cx, y, cy)
+      args ++= Seq[(String, js.Any)]((s"x${i+1}", cx), (s"y${i+1}", cy))
     }
+    canvas.drawLine(lit.applyDynamicNamed("apply")(args.toSeq:_*))
   }
 
   def default = {
